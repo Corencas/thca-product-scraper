@@ -1,0 +1,277 @@
+================================================================================
+THCA COMMUNITY PLATFORM - STARTUP INSTRUCTIONS
+================================================================================
+
+HOW TO START EVERYTHING (3 Terminals Needed)
+Follow these steps exactly every time you want to run the platform.
+
+================================================================================
+STEP 1: START THE BACKEND (Terminal 1)
+================================================================================
+
+1. cd ~/1thca-community-platform/backend
+2. set -a; source ../scrapers/.env; set +a
+3. source venv/bin/activate
+4. PYTHONPATH=.. python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+
+5. LEAVE THIS TERMINAL RUNNING!
+   Do NOT close it.
+
+6. Test it works:
+   Open browser to: http://localhost:8000/health
+   Should show: {"status":"healthy",...}
+
+================================================================================
+STEP 2: START THE FRONTEND (Terminal 2)
+================================================================================
+
+1. Open a SECOND NEW terminal window (keep Terminal 1 running!)
+
+2. Navigate to the frontend folder:
+   cd ~/1thca-community-platform/frontend
+
+3. Start the frontend:
+   npm run dev
+
+4. You should see:
+   VITE v5.x.x  ready in XXX ms
+   ➜  Local:   http://localhost:5173/
+   ➜  Network: use --host to expose
+
+5. LEAVE THIS TERMINAL RUNNING!
+   Do NOT close it.
+
+6. Test it works:
+   Open browser to: http://localhost:5173
+   You should see the THCA Community Platform!
+
+================================================================================
+STEP 3: START THE PRODUCT WATCHER (Terminal 3)
+================================================================================
+
+1. Open a THIRD NEW terminal window (keep Terminals 1 & 2 running!)
+
+2. Navigate to the scrapers folder:
+   cd ~/1thca-community-platform/scrapers
+
+3. Activate the virtual environment:
+   source ../backend/venv/bin/activate
+   
+   (You should see "(venv)" at the start of your prompt)
+
+4. Start the product watcher:
+   python product_watcher.py
+
+5. You should see:
+   INFO:__main__:Starting THCA Product Watcher (Standalone Version)...
+   INFO:__main__:Checking Tesoro - Shop Products...
+   INFO:__main__:Checking Hello Mary - Flower p1...
+
+6. LEAVE THIS TERMINAL RUNNING!
+   Do NOT close it.
+
+7. Check Discord:
+   New products should appear in your Discord channels!
+
+================================================================================
+SUMMARY - ALL 3 TERMINALS RUNNING
+================================================================================
+
+Terminal 1 (Backend):
+  Location: ~/1thca-community-platform/backend
+  Command:  uvicorn main:app --reload
+  URL:      http://localhost:8000
+
+Terminal 2 (Frontend):
+  Location: ~/1thca-community-platform/frontend
+  Command:  npm run dev
+  URL:      http://localhost:5173
+
+Terminal 3 (Product Watcher):
+  Location: ~/1thca-community-platform/scrapers
+  Command:  python product_watcher.py
+  Sends:    Discord notifications
+
+================================================================================
+HOW TO STOP EVERYTHING
+================================================================================
+
+To stop the platform:
+
+1. Go to each terminal window
+2. Press: Ctrl + C
+3. Wait for it to stop
+4. Close the terminal
+
+Do this for all 3 terminals.
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "Command not found: uvicorn"
+SOLUTION: 
+  cd ~/1thca-community-platform/backend
+  source venv/bin/activate
+  pip install -r requirements.txt
+
+PROBLEM: "Command not found: npm"
+SOLUTION:
+  sudo apt update
+  sudo apt install nodejs npm
+
+PROBLEM: "No module named 'sqlalchemy'"
+SOLUTION:
+  cd ~/1thca-community-platform/backend
+  source venv/bin/activate
+  pip install -r requirements.txt
+
+PROBLEM: "Port already in use"
+SOLUTION:
+  Kill the process:
+  sudo lsof -ti:8000 | xargs kill -9    (for backend)
+  sudo lsof -ti:5173 | xargs kill -9    (for frontend)
+
+PROBLEM: Backend won't start
+SOLUTION:
+  1. Make sure you activated venv: source venv/bin/activate
+  2. Check database exists: ls thca_platform.db
+  3. If missing, create it:
+     python -c "from models import Base, engine; Base.metadata.create_all(bind=engine)"
+
+PROBLEM: Frontend won't start
+SOLUTION:
+  cd ~/1thca-community-platform/frontend
+  rm -rf node_modules package-lock.json
+  npm install
+  npm run dev
+
+PROBLEM: Product watcher errors
+SOLUTION:
+  1. Make sure venv is activated
+  2. Install dependencies:
+     pip install sqlalchemy requests beautifulsoup4 discord-webhook lxml
+  3. Check Discord webhooks are correct in product_watcher.py
+
+PROBLEM: No products showing in frontend
+SOLUTION:
+  1. Check backend is running (http://localhost:8000/health)
+  2. Check product watcher is running and finding products
+  3. Wait a few minutes for products to be scraped
+  4. Check browser console (F12) for errors
+
+================================================================================
+QUICK COPY-PASTE STARTUP
+================================================================================
+
+If you want to start everything quickly, copy and paste these into 3 terminals:
+
+--- TERMINAL 1 (Backend) ---
+cd ~/1thca-community-platform/backend && source venv/bin/activate && uvicorn main:app --reload
+
+--- TERMINAL 2 (Frontend) ---
+cd ~/1thca-community-platform/frontend && npm run dev
+
+--- TERMINAL 3 (Watcher) ---
+cd ~/1thca-community-platform/scrapers && source ../backend/venv/bin/activate && python product_watcher.py
+
+================================================================================
+ACCESSING THE PLATFORM
+================================================================================
+
+Once all 3 terminals are running:
+
+Main Website:
+  http://localhost:5173
+
+Backend API:
+  http://localhost:8000
+
+API Documentation:
+  http://localhost:8000/docs
+
+Health Check:
+  http://localhost:8000/health
+
+================================================================================
+WHAT TO EXPECT
+================================================================================
+
+After starting everything:
+
+1. Frontend (http://localhost:5173) shows:
+   - Product browser
+   - Filters working
+   - Strain database
+   - Vendor list
+   - Analytics
+
+2. Backend (http://localhost:8000) provides:
+   - API endpoints
+   - Database queries
+   - Product data
+
+3. Product Watcher:
+   - Scrapes vendor sites every 4 seconds
+   - Posts new products to Discord
+   - Updates database
+   - Tracks price changes
+
+4. Discord channels show:
+   - New product notifications
+   - Price change alerts
+   - Restock notifications
+
+================================================================================
+DAILY WORKFLOW
+================================================================================
+
+Morning:
+1. Open 3 terminals
+2. Run the 3 startup commands above
+3. Check http://localhost:5173 to see it's working
+4. Check Discord for overnight notifications
+
+During the day:
+- Keep all 3 terminals running
+- Browse http://localhost:5173 anytime
+- Watch Discord for new drops
+
+Evening:
+- Press Ctrl+C in all 3 terminals to stop
+- Close terminals
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+1. All 3 components MUST be running for the platform to work fully:
+   - Backend: Provides data to frontend
+   - Frontend: Shows the website
+   - Watcher: Finds new products
+
+2. The virtual environment (venv) MUST be activated for Python commands
+
+3. Discord webhooks are already configured in product_watcher.py
+
+4. Database is created automatically on first run
+
+5. Products take a few minutes to appear after first startup
+
+6. The platform runs on your local machine (localhost)
+
+7. To access from other devices on your network:
+   - Backend: Use your computer's IP instead of localhost
+   - Frontend: npm run dev -- --host
+
+================================================================================
+END OF INSTRUCTIONS
+================================================================================
+
+Save this file for future reference!
+
+For more help, check:
+- README.md
+- QUICKSTART.md
+- docs/DEPLOYMENT.md
